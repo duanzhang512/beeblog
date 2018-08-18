@@ -5,8 +5,8 @@
       <div class="navbar-nav">
       	<li {{if .IsHome}}class="active"{{end}}>
         	<a class="nav-item nav-link" href="/">首页 <span class="sr-only">(current)</span></a>
-    	</li>
-    	<li {{if .IsCategory}} class="active"{{end}}>
+    	  </li>
+    	  <li {{if .IsCategory}} class="active"{{end}}>
         	<a class="nav-item nav-link" href="/category">分类</a>
         </li>
         <li {{if .IsTopic}} class="active"{{end}}>
