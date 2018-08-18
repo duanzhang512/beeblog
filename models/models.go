@@ -16,13 +16,9 @@ const (
 )
 
 type Category struct {
-	Id              int64
-	Title           string
-	Created         time.Time `orm:"index"`
-	Views           int64     `orm:"index"`
-	TopicTime       time.Time `orm:"index"`
-	TopicCount      int64
-	TopicLastUserId int64
+	Id         int64
+	Title      string
+	TopicCount int64
 }
 
 type Topic struct {
@@ -55,11 +51,7 @@ func RegisterDB() {
 func AddCategory(name string) error {
 	o := orm.NewOrm()
 
-	cate := &Category{
-		Title:     name,
-		Created:   time.Now(),
-		TopicTime: time.Now(),
-	}
+	cate := &Category{Title: name}
 
 	qs := o.QueryTable("category")
 	err := qs.Filter("title", name).One(cate)
@@ -76,7 +68,7 @@ func AddCategory(name string) error {
 	return nil
 }
 
-func DelCategory(id string) error {
+func DeleteCategory(id string) error {
 	cid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
 		return err
@@ -98,4 +90,85 @@ func GetAllCategories() ([]*Category, error) {
 	_, err := qs.All(&cates)
 
 	return cates, err
+}
+
+func AddTopic(title, content string) error {
+	o := orm.NewOrm()
+
+	topic := &Topic{
+		Title:     title,
+		Content:   content,
+		Created:   time.Now(),
+		Updated:   time.Now(),
+		ReplyTime: time.Now(),
+	}
+	_, err := o.Insert(topic)
+	return err
+}
+
+func GetTopic(tid string) (*Topic, error) {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	o := orm.NewOrm()
+
+	topic := new(Topic)
+
+	qs := o.QueryTable("topic")
+	err = qs.Filter("id", tidNum).One(topic)
+	if err != nil {
+		return nil, err
+	}
+
+	topic.Views++
+	_, err = o.Update(topic)
+	return topic, nil
+}
+
+func ModifyTopic(tid, title, content string) error {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	o := orm.NewOrm()
+	topic := &Topic{Id: tidNum}
+	if o.Read(topic) == nil {
+		topic.Title = title
+		topic.Content = content
+		topic.Updated = time.Now()
+		o.Update(topic)
+
+	}
+	return nil
+}
+
+func DeleteTopic(tid string) error {
+	tidNum, err := strconv.ParseInt(tid, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	o := orm.NewOrm()
+	topic := &Topic{Id: tidNum}
+	_, err = o.Delete(topic)
+	return err
+}
+
+func GetAllTopics(isDesc bool) (topics []*Topic, err error) {
+	o := orm.NewOrm()
+
+	topics = make([]*Topic, 0)
+
+	qs := o.QueryTable("topic")
+
+	if isDesc {
+		_, err = qs.OrderBy("-created").All(&topics)
+	} else {
+		_, err = qs.All(&topics)
+	}
+
+	return topics, err
 }

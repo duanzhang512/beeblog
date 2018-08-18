@@ -31,7 +31,7 @@ func (c *CategoryController) Get() {
 			break
 		}
 
-		err := models.DelCategory(id)
+		err := models.DeleteCategory(id)
 		if err != nil {
 			beego.Error(err)
 		}
