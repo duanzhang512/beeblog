@@ -14,6 +14,11 @@ func (c *CategoryController) Get() {
 
 	switch op {
 	case "add":
+		if !checkAccount(c.Ctx) {
+			c.Redirect("/login", 302)
+			return
+		}
+
 		name := c.Input().Get("name")
 		if len(name) == 0 {
 			break
