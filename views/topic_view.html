@@ -8,8 +8,16 @@
   </div>
 
   <div class="container">
-    <h1>{{.Topic.Title}}<a href="/topic/modify?tid={{.Tid}}" class="btn btn-default">修改文章</a></h1>
-    {{.Topic.Content}}   
+    {{$label := .Labels}}
+    {{with .Topic}}
+    <h1>{{.Title}} <small>{{.Category}}</small></h1>
+    <h5>
+      {{range $label}}
+      <a href="/?label={{.}}">{{.}}</a>
+      {{end}}
+    </h5>
+    {{.Content}}   
+    {{end}}
   </div>
 
  <div class="container">
